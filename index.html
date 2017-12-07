@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8" />
+	<title>Hattrick Man Marking Calculator</title>
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<style>
+		body {
+			width: 100%;
+			height: 100%;
+			font-family: 'Roboto', sans-serif;
+			font-size: 18px;
+		}
+		.container {
+			margin: 60px auto 0 auto;
+			width: 780px;
+		}
+		input,
+		.checkbox-label {
+			display: inline-block;
+		}
+		input[type=range] {
+			display: inline-block;
+			width: 600px;
+			height: 40px;
+		}
+		.value {
+			display: inline-block;
+			vertical-align: top;
+			margin-top: 6px;
+			margin-left: 18px;
+			font-size: 24px;
+		}
+		.formula {
+			margin-top: 32px;
+		}
+		.formula span {
+			color: red;
+			font-size: 22px;
+		}
+		.formula span.result,
+		.formula span.p {
+			color: blue;
+		}
+
+		.checkbox-container {
+			display: inline-block;
+			width: 380px;
+		}
+	</style>
+
+</head>
+
+<body>
+
+<div class="container">
+	<p>Defending of your player:</p>
+	<div class="line">
+		<input type="range" id="input-def" min="1" max="20" step="1" value="10" />
+		<div class="value">10</div>
+	</div>
+
+	<p>Highest skill of the marked player:</p>
+	<div class="line">
+		<input type="range" id="input-hs" min="1" max="20" step="1" value="10" />
+		<div class="value">10</div>
+	</div>
+
+	<div class="checkbox-container">
+		<input type="checkbox" id="powerful" />
+		<p class="checkbox-label">Your player is <strong>Powerful</strong></p>
+
+		<div></div>
+
+		<input type="checkbox" id="specless" />
+		<p class="checkbox-label">Your player is <strong>specless</strong></p>
+	</div>
+
+	<div class="checkbox-container">
+		<input type="checkbox" id="technical" />
+		<p class="checkbox-label">Marked player is <strong>Technical</strong></p>
+
+		<div></div>
+
+		<input type="checkbox" id="unpredictable" />
+		<p class="checkbox-label">Marked player is <strong>Unpredictable</strong></p>
+	</div>
+
+	<p class="formula">penalty = <span class="def">10</span> ^ 3.5 / (<span class="def">10</span> ^ 3.5 + <span class="hs">10</span> ^ 3.5) = <span class="result">50</span><span class="p">%</span></p>
+	<p class="perf">Marked player performance (highest skill): <span id="hsp">5</span>
+</div>
+
+<script>
+	var el = function(id) {
+		return document.getElementById(id);
+	};
+
+	var pow = Math.pow;
+	var i = parseInt;
+
+	[].forEach.call(document.querySelectorAll('input[type=range]'), function(input) {
+		input.addEventListener('input', function(e) {
+			input.nextElementSibling.innerHTML = input.value;
+
+			[].forEach.call(document.querySelectorAll('.def'), function(dom) {
+				dom.innerHTML = el('input-def').value;
+			});
+
+			[].forEach.call(document.querySelectorAll('.hs'), function(dom) {
+				dom.innerHTML = el('input-hs').value
+			});
+
+			displayResult();
+
+		});
+	});
+
+	el('powerful').addEventListener('change', function(e) {
+		if (el('powerful').checked) {
+			el('specless').checked = false;
+		}
+		displayResult();
+	});
+
+	el('specless').addEventListener('change', function(e) {
+		if (el('specless').checked) {
+			el('powerful').checked = false;
+		}
+		displayResult();
+	});
+
+	el('technical').addEventListener('change', function(e) {
+		if (el('technical').checked) {
+			el('unpredictable').checked = false;
+		}
+		displayResult();
+	});
+
+	el('unpredictable').addEventListener('change', function(e) {
+		if (el('unpredictable').checked) {
+			el('technical').checked = false;
+		}
+		displayResult();
+	});
+
+	var getBoost = function() {
+		return el('specless').checked ? 1.05 : el('powerful').checked ? 1.1 : 1;
+	}
+
+	var getDeviation = function() {
+		return el('technical').checked ? 0.1 : el('unpredictable').checked ? -0.1 : 0;
+	}
+
+	var displayResult = function() {
+		[].forEach.call(document.querySelectorAll('.result'), function(dom) {
+			dom.innerHTML = 100 * result(getBoost(), getDeviation());
+		});
+		el('hsp').innerHTML = i(el('input-hs').value) * (1 - result(getBoost(), getDeviation()));
+	}
+
+	var result = function(boost, deviation) {
+		boost = boost || 1;
+		deviation = deviation || 0;
+		return pow(i(el('input-def').value) * boost, 3.5) / (pow(i(el('input-def').value) * boost, 3.5) + pow(i(el('input-hs').value), 3.5)) + deviation;
+	}
+</script>
+
+</body>
+</html>
