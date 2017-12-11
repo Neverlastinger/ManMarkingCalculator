@@ -50,6 +50,18 @@
 			display: inline-block;
 			width: 380px;
 		}
+		.note_marker {
+			color: purple;
+		}
+		.note {
+			margin-top: 32px;
+			color: purple;
+			font-size: 12px;
+		}
+		.intro {
+			margin-bottom: 64px;
+			font-size: 14px;
+		}
 	</style>
 
 </head>
@@ -57,13 +69,17 @@
 <body>
 
 <div class="container">
-	<p>Defending of your player:</p>
+
+	<p class="intro">
+		Hattrick Man Marking Calculator made by Shadows RFC (666151). I made this for 1.5 hours, so any mistakes can be expected, although no one in the forum has found any error yet. Last updated: 11 Dec 2017.
+	</p>
+	<p>Defending<span class="note_marker">*</span> of your player:</p>
 	<div class="line">
 		<input type="range" id="input-def" min="1" max="20" step="1" value="10" />
 		<div class="value">10</div>
 	</div>
 
-	<p>Highest skill of the marked player:</p>
+	<p>Highest skill<span class="note_marker">*</span> of the marked player:</p>
 	<div class="line">
 		<input type="range" id="input-hs" min="1" max="20" step="1" value="10" />
 		<div class="value">10</div>
@@ -89,8 +105,12 @@
 		<p class="checkbox-label">Marked player is <strong>Unpredictable</strong></p>
 	</div>
 
-	<p class="formula">penalty = <span class="def">10</span> ^ 3.5 / (<span class="def">10</span> ^ 3.5 + <span class="hs">10</span> ^ 3.5) = <span class="result">50</span><span class="p">%</span></p>
-	<p class="perf">Marked player performance (highest skill): <span id="hsp">5</span>
+	<p class="formula">penalty = <span class="def">10</span> ^ 3.5 / (<span class="def">10</span> ^ 3.5 + <span class="hs">10</span> ^ 3.5) <span class="boost">+0%</span> = <span class="result">50</span><span class="p">%</span></p>
+	<p class="perf">Marked player performance (highest skill): <span id="hsp">5</span></p>
+
+	<p class="note">
+		*That is not the real Defending skill and Highest skill, but the defending skill and the highest skill taking into account form, stamina, loyalty, Xp and health. (Thanks to LA-alpacstily for pointing this out)
+	</p>
 </div>
 
 <script>
@@ -104,17 +124,7 @@
 	[].forEach.call(document.querySelectorAll('input[type=range]'), function(input) {
 		input.addEventListener('input', function(e) {
 			input.nextElementSibling.innerHTML = input.value;
-
-			[].forEach.call(document.querySelectorAll('.def'), function(dom) {
-				dom.innerHTML = el('input-def').value;
-			});
-
-			[].forEach.call(document.querySelectorAll('.hs'), function(dom) {
-				dom.innerHTML = el('input-hs').value
-			});
-
 			displayResult();
-
 		});
 	});
 
@@ -155,6 +165,20 @@
 	}
 
 	var displayResult = function() {
+
+		[].forEach.call(document.querySelectorAll('.def'), function(dom) {
+			dom.innerHTML = (i(el('input-def').value) * Number(getBoost())).toFixed(2);
+		});
+
+		[].forEach.call(document.querySelectorAll('.hs'), function(dom) {
+			dom.innerHTML = el('input-hs').value;
+		});
+
+		[].forEach.call(document.querySelectorAll('.boost'), function(dom) {
+			var percentage = Number(getDeviation()) * 100;
+			dom.innerHTML = percentage >= 0 ? '+' + percentage + '%' : percentage + '%';
+		});
+
 		[].forEach.call(document.querySelectorAll('.result'), function(dom) {
 			dom.innerHTML = 100 * result(getBoost(), getDeviation());
 		});
