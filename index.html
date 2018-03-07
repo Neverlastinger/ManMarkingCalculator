@@ -59,7 +59,7 @@
 			font-size: 12px;
 		}
 		.intro {
-			margin-bottom: 64px;
+			margin-bottom: 32px;
 			font-size: 14px;
 		}
 	</style>
@@ -71,9 +71,13 @@
 <div class="container">
 
 	<p class="intro">
-		Hattrick Man Marking Calculator made by Shadows RFC (666151). I made this for 1.5 hours, so any mistakes can be expected, although no one in the forum has found any error yet. Last updated: 11 Dec 2017.
+		Hattrick Man Marking Calculator made by Shadows RFC (666151). I made this for 1.5 hours, so any mistakes can be expected, although no one in the forum has found any error yet. Updated: 11 Dec 2017.
 	</p>
-	<p>Defending<span class="note_marker">*</span> of your player:</p>
+	<p class="intro">
+		Updated on 07 Mar 2018 to reflect the latest changes: see forum post (17167129.23)
+	</p>
+
+	<p style="margin-top: 64px; ">Defending<span class="note_marker">*</span> of your player:</p>
 	<div class="line">
 		<input type="range" id="input-def" min="1" max="20" step="1" value="10" />
 		<div class="value">10</div>
@@ -105,7 +109,7 @@
 		<p class="checkbox-label">Marked player is <strong>Unpredictable</strong></p>
 	</div>
 
-	<p class="formula">penalty = <span class="def">10</span> ^ 3.5 / (<span class="def">10</span> ^ 3.5 + <span class="hs">10</span> ^ 3.5) <span class="boost">+0%</span> = <span class="result">50</span><span class="p">%</span></p>
+	<p class="formula">penalty = <span class="def">10</span> ^ 3.5 / (<span class="def">10</span> ^ 3.5 + <span class="hs">10</span> ^ 3.5) = <span class="result">50</span><span class="p">%</span></p>
 	<p class="perf">Marked player performance (highest skill): <span id="hsp">5</span></p>
 
 	<p class="note">
@@ -161,7 +165,7 @@
 	}
 
 	var getDeviation = function() {
-		return el('technical').checked ? 0.1 : el('unpredictable').checked ? -0.1 : 0;
+		return el('technical').checked ? 0.92 : el('unpredictable').checked ? 1.08 : 1;
 	}
 
 	var displayResult = function() {
@@ -171,7 +175,7 @@
 		});
 
 		[].forEach.call(document.querySelectorAll('.hs'), function(dom) {
-			dom.innerHTML = el('input-hs').value;
+			dom.innerHTML = Number.parseFloat(i(el('input-hs').value) * getDeviation()).toFixed(2);
 		});
 
 		[].forEach.call(document.querySelectorAll('.boost'), function(dom) {
@@ -187,8 +191,7 @@
 
 	var result = function(boost, deviation) {
 		boost = boost || 1;
-		deviation = deviation || 0;
-		return pow(i(el('input-def').value) * boost, 3.5) / (pow(i(el('input-def').value) * boost, 3.5) + pow(i(el('input-hs').value), 3.5)) + deviation;
+		return pow(i(el('input-def').value) * boost, 3.5) / (pow(i(el('input-def').value) * boost, 3.5) + pow(i(el('input-hs').value) * deviation, 3.5));
 	}
 </script>
 
